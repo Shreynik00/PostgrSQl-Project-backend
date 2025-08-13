@@ -24,7 +24,7 @@ app.use(morgan("tiny"));
 // DB-specific routes will be added below in each path
 
 app.get("/", (req, res) => {
-  res.send("API is live 🚀");
+  res.send("🚀 API is live and running!");
 });
 
 app.get("/health", async (req, res) => {
@@ -52,7 +52,10 @@ app.get("/users", async (req, res) => {
     res.status(201).json(rows[0]);
   });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`API on :${port}`));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`API on :${PORT}`);
+});
+
 
 
