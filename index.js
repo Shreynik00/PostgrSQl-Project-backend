@@ -23,7 +23,7 @@ app.use(morgan("tiny"));
 
 // DB-specific routes will be added below in each path
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.send("🚀 API is live and running!");
 });
 
@@ -56,6 +56,7 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`API on :${PORT}`);
 });
+
 
 
 
