@@ -18,7 +18,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
-app.use(cors({ origin: "https://shreynik00.github.io/PostgrSQl-Project-front-end-/" }));
+app.use(cors({
+  origin: "https://shreynik00.github.io", // only domain, no path
+  credentials: true
+}));
 
 
 
@@ -57,6 +60,7 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`API on :${PORT}`);
 });
+
 
 
 
