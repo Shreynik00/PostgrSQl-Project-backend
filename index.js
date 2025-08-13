@@ -10,7 +10,7 @@ const { Pool } = pkg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Neon requires SSL
+  ssl: { rejectUnauthorized: false }
 });
 
 
@@ -19,12 +19,21 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
-app.get("/health", (req, res) => res.json({ ok: true }));
+
 
 // DB-specific routes will be added below in each path
 
 app.get("/", (req, res) => {
   res.send("API is live 🚀");
+});
+
+app.get("/health", async (req, res) => {
+  try {
+    const dbRes = await pool.query("SELECT NOW()");
+    res.json({ status: "ok", dbTime: dbRes.rows[0].now });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: err.message });
+  }
 });
 
 // Route: Get all users
@@ -45,4 +54,5 @@ app.get("/users", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`API on :${port}`));
+
 
