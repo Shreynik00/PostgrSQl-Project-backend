@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
 app.get("/health", async (req, res) => {
   try {
     const dbRes = await pool.query("SELECT NOW()");
-    res.json({ status: "ok", dbTime: dbRes.rows[0].now });
+    res.json({ status: "ok badiya", dbTime: dbRes.rows[0].now });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message });
   }
@@ -56,6 +56,7 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`API on :${PORT}`);
 });
+
 
 
 
