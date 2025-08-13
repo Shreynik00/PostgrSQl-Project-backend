@@ -23,6 +23,10 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 
 // DB-specific routes will be added below in each path
 
+app.get("/", (req, res) => {
+  res.send("API is live 🚀");
+});
+
 // Route: Get all users
 app.get("/users", async (req, res) => {
     const { rows } = await pool.query("SELECT * FROM users ORDER BY id");
@@ -41,3 +45,4 @@ app.get("/users", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`API on :${port}`));
+
