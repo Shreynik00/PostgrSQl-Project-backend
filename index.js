@@ -1,46 +1,47 @@
+// backend/index.js
 import 'dotenv/config';
-
 import express from "express";
-
 import cors from "cors";
 import morgan from "morgan";
+import bcrypt from "bcryptjs";   // ✅ missing import
 import pkg from "pg";
 
 const { Pool } = pkg;
 
+// PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
-
 
 const app = express();
 
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(cors({
-  origin: "https://shreynik00.github.io", // only domain, no path
+  origin: "https://shreynik00.github.io", // ✅ frontend origin
   credentials: true
 }));
 
-
-
-// DB-specific routes will be added below in each path
-
-app.get("/", async (req, res) => {
+// -----------------------------------
+// Base routes
+// -----------------------------------
+app.get("/", (req, res) => {
   res.send("🚀 API is live and running!");
 });
 
 app.get("/health", async (req, res) => {
   try {
     const dbRes = await pool.query("SELECT NOW()");
-    res.json({ status: "ok badiya", dbTime: dbRes.rows[0].now });
+    res.json({ status: "ok", dbTime: dbRes.rows[0].now });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message });
   }
 });
 
-// ✅ Signup (email + password)
+// -----------------------------------
+// Local Signup
+// -----------------------------------
 app.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -68,12 +69,18 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// ✅ Login (email + password)
+// -----------------------------------
+// Local Login
+// -----------------------------------
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const { rows } = await pool.query("SELECT * FROM users WHERE email=$1 AND provider='local'", [email]);
+    const { rows } = await pool.query(
+      "SELECT * FROM users WHERE email=$1 AND provider='local'",
+      [email]
+    );
+
     if (rows.length === 0) {
       return res.status(400).json({ error: "User not found" });
     }
@@ -84,19 +91,27 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid password" });
     }
 
-    res.json({ message: "Login successful", user: { id: user.id, name: user.name, email: user.email } });
+    res.json({
+      message: "Login successful",
+      user: { id: user.id, name: user.name, email: user.email }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Login failed" });
   }
 });
 
-// ✅ Google Auth login/signup
+// -----------------------------------
+// Google Auth Signup/Login
+// -----------------------------------
 app.post("/google-auth", async (req, res) => {
   try {
     const { name, email, googleId } = req.body;
 
-    let { rows } = await pool.query("SELECT * FROM users WHERE provider='google' AND provider_id=$1", [googleId]);
+    let { rows } = await pool.query(
+      "SELECT * FROM users WHERE provider='google' AND provider_id=$1",
+      [googleId]
+    );
 
     if (rows.length === 0) {
       // new Google user -> insert
@@ -115,16 +130,11 @@ app.post("/google-auth", async (req, res) => {
     res.status(500).json({ error: "Google auth failed" });
   }
 });
+
+// -----------------------------------
+// Server
+// -----------------------------------
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`API on :${PORT}`);
+  console.log(`✅ API running on port ${PORT}`);
 });
-
-
-
-
-
-
-
-
-
